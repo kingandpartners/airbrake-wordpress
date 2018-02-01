@@ -56,7 +56,7 @@ function register_airbrake_settings() {
   );
   add_settings_field(
     'airbrake_wordpress_setting_projectid',
-    'API Key',
+    'Project ID',
     'airbrake_wordpress_setting_projectid_callback',
     AW_SLUG,
     'airbrake_setting_section'
