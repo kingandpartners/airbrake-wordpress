@@ -21,11 +21,6 @@ define( 'AW_SLUG', 'airbrake-wordpress' );
 define( 'AW_DOCROOT', dirname( __FILE__ ) );
 define( 'AW_WEBROOT', str_replace( getcwd(), home_url(), dirname(__FILE__) ) );
 
-register_activation_hook( __FILE__, 'airbrake_wordpress_install' );
-register_deactivation_hook( __FILE__, 'airbrake_wordpress_uninstall' );
-
-add_action( 'admin_menu', 'airbrake_wordpress_admin_menu' );
-
 include 'classes/install.php';
 include 'classes/controller.php';
 
@@ -34,6 +29,16 @@ if (getenv('AIRBRAKE_ENABLED')) {
   update_option('airbrake_wordpress_setting_status', $active);
 } else {
   $active = get_option('airbrake_wordpress_setting_status');
+}
+
+if (getenv('AIRBRAKE_API_KEY') !== false) {
+  $apikey = getenv('AIRBRAKE_API_KEY');
+  update_option('airbrake_wordpress_setting_apikey', $apikey);
+}
+
+if (getenv('AIRBRAKE_PROJECT_ID') !== false) {
+  $projectid = getenv('AIRBRAKE_PROJECT_ID');
+  update_option('airbrake_wordpress_setting_projectid', $projectid);
 }
 
 if ( $active ) {
@@ -56,6 +61,4 @@ if ( $active ) {
   Airbrake\Instance::set($notifier);
   $handler = new Airbrake\ErrorHandler($notifier);
   $handler->register();
-
 }
-
