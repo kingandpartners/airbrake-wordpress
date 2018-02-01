@@ -21,7 +21,6 @@ define( 'AW_SLUG', 'airbrake-wordpress' );
 define( 'AW_DOCROOT', dirname( __FILE__ ) );
 define( 'AW_WEBROOT', str_replace( getcwd(), home_url(), dirname(__FILE__) ) );
 
-
 register_activation_hook( __FILE__, 'airbrake_wordpress_install' );
 register_deactivation_hook( __FILE__, 'airbrake_wordpress_uninstall' );
 
@@ -42,15 +41,6 @@ if ( $active ) {
   $apiKey   = trim( get_option( 'airbrake_wordpress_setting_apikey' ) );
   $async    = (boolean) get_option( 'airbrake_wordpress_setting_async' );
   $timeout  = (int) get_option( 'airbrake_wordpress_setting_timeout' );
-  $warrings = get_option( 'airbrake_wordpress_setting_warrings' );
-
-  // $options = array(
-  //   'async'           => $async,
-  //   'timeout'         => $timeout,
-  //   'environmentName' => getenv('WP_ENV') ? getenv('WP_ENV') : 'production'
-  // );
-
-  $environment = getenv('WP_ENV') ? getenv('WP_ENV') : 'production';
 
   $notifier = new Airbrake\Notifier([
     'projectId'  => 12345,
@@ -58,6 +48,7 @@ if ( $active ) {
   ]);
 
   $notifier->addFilter(function ($notice) {
+    $environment = getenv('WP_ENV') ? getenv('WP_ENV') : 'production';
     $notice['context']['environment'] = $environment;
     return $notice;
   });
