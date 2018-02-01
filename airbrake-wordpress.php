@@ -61,4 +61,5 @@ if ( $active ) {
   Airbrake\Instance::set($notifier);
   $handler = new Airbrake\ErrorHandler($notifier);
   $handler->register();
+
 }
