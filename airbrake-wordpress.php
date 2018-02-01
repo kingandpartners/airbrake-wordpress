@@ -30,19 +30,41 @@ add_action( 'admin_menu', 'airbrake_wordpress_admin_menu' );
 include 'classes/install.php';
 include 'classes/controller.php';
 
-if ( get_option('airbrake_wordpress_setting_status') ) {
-	require_once 'classes/airbrake-php/src/Airbrake/EventHandler.php';
-	$apiKey  = trim( get_option( 'airbrake_wordpress_setting_apikey' ) );
+if (getenv('AIRBRAKE_ENABLED')) {
+  $active = getenv('AIRBRAKE_ENABLED') == 'true' ? '1' : '0';
+  update_option('airbrake_wordpress_setting_status', $active);
+} else {
+  $active = get_option('airbrake_wordpress_setting_status');
+}
 
-	$async = (boolean) get_option( 'airbrake_wordpress_setting_async' );
-	$timeout = (int) get_option( 'airbrake_wordpress_setting_timeout' );
-	$warrings = get_option( 'airbrake_wordpress_setting_warrings' );
+if ( $active ) {
+  // require_once 'classes/airbrake-php/src/Airbrake/EventHandler.php';
+  $apiKey   = trim( get_option( 'airbrake_wordpress_setting_apikey' ) );
+  $async    = (boolean) get_option( 'airbrake_wordpress_setting_async' );
+  $timeout  = (int) get_option( 'airbrake_wordpress_setting_timeout' );
+  $warrings = get_option( 'airbrake_wordpress_setting_warrings' );
 
-	$options = array(
-		'async'   => $async,
-		'timeout' => $timeout,
-	);
+  // $options = array(
+  //   'async'           => $async,
+  //   'timeout'         => $timeout,
+  //   'environmentName' => getenv('WP_ENV') ? getenv('WP_ENV') : 'production'
+  // );
 
-	Airbrake\EventHandler::start( $apiKey, $warrings, $options );
+  $environment = getenv('WP_ENV') ? getenv('WP_ENV') : 'production';
+
+  $notifier = new Airbrake\Notifier([
+    'projectId'  => 12345,
+    'projectKey' => $apiKey
+  ]);
+
+  $notifier->addFilter(function ($notice) {
+    $notice['context']['environment'] = $environment;
+    return $notice;
+  });
+
+  Airbrake\Instance::set($notifier);
+  $handler = new Airbrake\ErrorHandler($notifier);
+  $handler->register();
+
 }
 

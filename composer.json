@@ -1,0 +1,13 @@
+{
+    "name": "kingandpartners/airbrake-wordpress",
+    "type": "wordpress-plugin",
+    "require": {
+        "airbrake/phpbrake": "^0.5.2"
+    },
+    "authors": [
+        {
+            "name": "Justin Grubbs",
+            "email": "justin@kingandpartners.com"
+        }
+    ]
+}
